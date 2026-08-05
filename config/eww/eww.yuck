@@ -1,0 +1,90 @@
+(defpoll clock-time :interval "1s" `date '+%H:%M'`)
+(defpoll clock-seconds :interval "1s" `date '+%S'`)
+(defpoll clock-date :interval "60s" `date '+%a, %d %b'`)
+(defpoll cpu-usage :interval "2s" `~/.config/eww/scripts/sys-info cpu`)
+(defpoll ram-usage :interval "3s" `~/.config/eww/scripts/sys-info ram`)
+(defpoll disk-usage :interval "30s" `~/.config/eww/scripts/sys-info disk`)
+(defpoll cpu-temp :interval "5s" `~/.config/eww/scripts/sys-info temp`)
+(defpoll net-status :interval "5s" `~/.config/eww/scripts/sys-info net-status`)
+(defpoll net-ip :interval "10s" `~/.config/eww/scripts/sys-info net-ip`)
+(defpoll volume-level :interval "0.5s" `~/.config/eww/scripts/sys-info volume`)
+(defpoll volume-muted :interval "0.5s" `~/.config/eww/scripts/sys-info muted`)
+(deflisten workspaces :initial "[]" `~/.config/eww/scripts/workspaces`)
+
+(defwidget workspaces-widget []
+  (box :class "workspaces" :orientation "h" :spacing 6 :halign "start"
+    (for ws in workspaces
+      (button
+        :class "ws-btn ${ws.focused ? 'ws-focused' : ''} ${ws.urgent ? 'ws-urgent' : ''}"
+        :onclick "i3-msg workspace number ${ws.num}"
+        "${ws.num}"))))
+
+(defwidget clock-widget []
+  (box :class "clock-container" :orientation "h" :spacing 12 :halign "center"
+    (label :class "clock-icon" :text "")
+    (label :class "clock-date" :text clock-date)
+    (box :class "clock-time-box" :orientation "h"
+      (label :class "clock-time" :text clock-time)
+      (label :class "clock-seconds" :text ":${clock-seconds}"))))
+
+(defwidget metric [value icon label color]
+  (box :class "metric" :orientation "h" :spacing 8 :tooltip "${label}: ${value}%"
+    (overlay
+      (circular-progress :class "metric-circle metric-bg" :thickness 4 :value 100 :start-at 75)
+      (circular-progress :class "metric-circle metric-${color}" :thickness 4 :value value :start-at 75)
+      (label :class "metric-icon metric-icon-${color}" :text icon))
+    (label :class "metric-value" :text "${value}%")))
+
+(defwidget system-stats []
+  (box :class "sys-stats" :orientation "h" :spacing 16 :halign "end"
+    (metric :value cpu-usage :icon "" :label "CPU" :color "green")
+    (metric :value ram-usage :icon "󰍛" :label "RAM" :color "blue")
+    (metric :value disk-usage :icon "󰋊" :label "Disco" :color "amber")))
+
+(defwidget temp-widget []
+  (box :class "temp-box" :orientation "h" :spacing 6 :tooltip "CPU: ${cpu-temp}C"
+    (label :class "temp-icon" :text "󰔏")
+    (label :class "temp-value" :text "${cpu-temp}C")))
+
+(defwidget network-widget []
+  (box :class "network-box ${net-status == 'connected' ? 'net-on' : 'net-off'}"
+       :orientation "h" :spacing 6 :tooltip "${net-ip}"
+    (label :class "net-icon" :text {net-status == "connected" ? "󰈀" : "󰈂"})
+    (label :class "net-label" :text {net-status == "connected" ? net-ip : "offline"})))
+
+(defwidget volume-widget []
+  (eventbox
+    :onclick "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    :onscroll "~/.config/eww/scripts/volume-ctl {}"
+    (box :class "volume-box ${volume-muted == 'true' ? 'vol-muted' : ''}"
+         :orientation "h" :spacing 8 :tooltip "Vol: ${volume-level}%"
+      (label :class "vol-icon" :text {
+        volume-muted == "true" ? "󰖁" :
+        volume-level < 30 ? "󰕿" :
+        volume-level < 70 ? "󰖀" : "󰕾"})
+      (scale :class "vol-slider" :min 0 :max 101 :value volume-level
+        :onchange "pactl set-sink-volume @DEFAULT_SINK@ {}%" :orientation "h"))))
+
+(defwidget power-widget []
+  (button :class "power-btn"
+          :onclick "i3-nagbar -t warning -m 'Sair do i3?' -B 'Sim' 'i3-msg exit'"
+          :tooltip "Power" "⏻"))
+
+(defwidget sep []
+  (box :class "separator" :vexpand true
+    (label :class "sep-line" :text "│")))
+
+(defwidget bar-layout []
+  (centerbox :class "bar-inner" :orientation "h"
+    (box :class "bar-section" :orientation "h" :spacing 12 :halign "start" :space-evenly false
+      (workspaces-widget))
+    (box :class "bar-section" :orientation "h" :spacing 0 :halign "center" :space-evenly false
+      (clock-widget))
+    (box :class "bar-section" :orientation "h" :spacing 12 :halign "end" :space-evenly false
+      (system-stats) (sep) (temp-widget) (sep) (network-widget) (sep) (volume-widget) (sep) (power-widget))))
+
+(defwindow bar
+  :monitor 0
+  :geometry (geometry :x "0%" :y "10px" :width "99%" :height "66px" :anchor "top center")
+  :stacking "fg" :exclusive true :namespace "eww-bar"
+  (bar-layout))

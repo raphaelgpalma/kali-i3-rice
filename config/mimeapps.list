@@ -1,0 +1,12 @@
+[Added Associations]
+video/mp4=mpv-3.desktop;mpv-2.desktop;
+
+[Default Applications]
+inode/directory=org.kde.dolphin.desktop
+video/mp4=mpv-3.desktop;
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+text/html=google-chrome.desktop
+x-scheme-handler/http=google-chrome.desktop
+x-scheme-handler/https=google-chrome.desktop
+x-scheme-handler/about=google-chrome.desktop
+x-scheme-handler/unknown=google-chrome.desktop

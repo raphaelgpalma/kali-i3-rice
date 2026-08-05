@@ -1,0 +1,21 @@
+# --- CONFIGURAÇÕES GERAIS ---
+font_family      JetBrainsMono Nerd Font
+font_size        11.0
+window_padding_width 10
+
+# --- TRANSPARÊNCIA ---
+background_opacity 0.85
+dynamic_background_opacity yes
+
+# --- CURSOR (ESTILO HYPRLAND) ---
+cursor_shape block
+cursor_trail 3
+cursor_trail_decay 0.1 0.4
+cursor_trail_start_threshold 2
+
+# --- TEMA (GERENCIADO PELO KITTEN) ---
+# O include abaixo deve ser ÚNICO no arquivo
+# BEGIN_KITTY_THEME
+# Atelier Cave Dark
+include current-theme.conf
+# END_KITTY_THEME

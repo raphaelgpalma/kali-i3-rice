@@ -1,0 +1,12 @@
+{
+    "Alt-/": "lua:comment.comment",
+    "CtrlUnderscore": "lua:comment.comment",
+    "AltUp": "ParagraphPrevious",
+    "AltDown": "ParagraphNext",
+    "AltLeft": "WordLeft",
+    "AltRight": "WordRight",
+    "CtrlUp": "ParagraphPrevious",
+    "CtrlDown": "ParagraphNext",
+    "Ctrl-AltUp": "CursorStart",          
+    "Ctrl-AltDown": "CursorEnd"  
+}

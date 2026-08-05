@@ -1,0 +1,110 @@
+$bg: #1a1b26;
+$bg-bar: rgba(26, 27, 38, 0.85);
+$bg-widget: rgba(40, 42, 54, 0.6);
+$bg-hover: rgba(152, 195, 121, 0.15);
+$fg: #c0caf5;
+$fg-dim: #565f89;
+$fg-dark: #3b4261;
+$green: #98C379;
+$green-dim: rgba(152, 195, 121, 0.3);
+$blue: #61AFEF;
+$amber: #E5C07B;
+$red: #E06C75;
+$cyan: #56B6C2;
+$purple: #C678DD;
+$radius: 16px;
+$radius-sm: 10px;
+$radius-pill: 50px;
+
+* { all: unset; font-family: "JetBrainsMono Nerd Font", monospace; font-size: 19px; }
+
+.bar-inner {
+  background: $bg-bar;
+  border-radius: $radius;
+  border: 1px solid rgba(152, 195, 121, 0.12);
+  padding: 0 28px;
+  margin: 0 8px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4), 0 0 1px rgba(152, 195, 121, 0.2);
+}
+
+.workspaces { margin: 6px 0; }
+.ws-btn {
+  font-size: 14px; font-weight: bold;
+  min-width: 50px; min-height: 50px;
+  border-radius: $radius-pill;
+  background: $bg-widget; color: $fg-dim;
+  transition: all 200ms ease;
+  &:hover { background: $bg-hover; color: $fg; }
+}
+.ws-focused {
+  background: $green; color: #000;
+  box-shadow: 0 0 16px $green-dim;
+  &:hover { background: lighten($green, 8%); }
+}
+.ws-urgent { background: $red; color: #fff; }
+
+.clock-container {
+  padding: 6px 22px; border-radius: $radius-sm;
+  background: $bg-widget; border: 1px solid rgba(152, 195, 121, 0.08);
+}
+.clock-icon { font-size: 23px; color: $green; margin-right: 4px; }
+.clock-date { font-size: 20px; color: $fg-dim; }
+.clock-time { font-size: 26px; font-weight: bold; color: $fg; letter-spacing: 2px; }
+.clock-seconds { font-size: 18px; color: $green; margin-top: 3px; }
+.clock-time-box { margin-left: 8px; padding-left: 12px; border-left: 1px solid $fg-dark; }
+
+.metric { padding: 2px 4px; border-radius: $radius-sm; &:hover { background: $bg-hover; } }
+.metric-circle { min-width: 48px; min-height: 48px; }
+.metric-bg { color: $fg-dark; }
+.metric-green { color: $green; }
+.metric-blue { color: $blue; }
+.metric-amber { color: $amber; }
+.metric-icon { font-size: 26px; }
+.metric-icon-green { color: $green; }
+.metric-icon-blue { color: $blue; }
+.metric-icon-amber { color: $amber; }
+.metric-value { font-size: 19px; color: $fg; font-weight: 500; min-width: 50px; }
+
+.temp-box { padding: 4px 8px; border-radius: $radius-sm; }
+.temp-icon { font-size: 23px; color: $amber; }
+.temp-value { font-size: 19px; color: $fg; }
+
+.network-box { padding: 4px 10px; border-radius: $radius-sm; }
+.net-on .net-icon { color: $green; font-size: 23px; }
+.net-off .net-icon { color: $red; font-size: 23px; }
+.net-label { font-size: 19px; color: $fg; }
+.net-off .net-label { color: $fg-dim; }
+
+.volume-box {
+  padding: 4px 10px; border-radius: $radius-sm;
+  &:hover { background: $bg-hover; }
+}
+.vol-icon { font-size: 23px; color: $cyan; min-width: 24px; }
+.vol-muted .vol-icon { color: $fg-dim; }
+.vol-slider {
+  min-width: 140px; min-height: 6px;
+  trough { background: $fg-dark; border-radius: $radius-pill; min-height: 6px; }
+  highlight { background: linear-gradient(to right, $cyan, $green); border-radius: $radius-pill; min-height: 6px; }
+  slider {
+    background: $fg; border-radius: $radius-pill;
+    min-width: 14px; min-height: 14px; margin: -4px 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  }
+  slider:hover { background: $green; min-width: 16px; min-height: 16px; margin: -5px 0; }
+}
+
+.power-btn {
+  font-size: 26px; color: $red;
+  min-width: 50px; min-height: 50px;
+  border-radius: $radius-pill;
+  background: rgba(224, 108, 117, 0.08);
+  &:hover { background: rgba(224, 108, 117, 0.25); box-shadow: 0 0 12px rgba(224, 108, 117, 0.2); }
+}
+
+.separator { margin: 8px 0; }
+.sep-line { font-size: 26px; color: rgba(152, 195, 121, 0.15); }
+
+tooltip {
+  background: $bg; border: 1px solid $green-dim;
+  border-radius: $radius-sm; padding: 8px 14px; color: $fg; font-size: 19px;
+}

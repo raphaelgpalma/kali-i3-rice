@@ -1,0 +1,150 @@
+# =============================================================================
+# i3wm Config - Professional Pentest Layout (Final Fixed)
+# =============================================================================
+
+# Define a tecla Super como principal
+set $mod Mod4
+
+# --- FIX DO ALT (MOD1) ---
+# Limpa as máscaras de modificadores e atribui corretamente cada tecla
+# Isso resolve o problema de o Alt não ser reconhecido em editores/terminais
+exec_always --no-startup-id xmodmap -e "clear mod1" -e "add mod1 = Alt_L Alt_R"
+exec_always --no-startup-id xmodmap -e "clear mod4" -e "add mod4 = Super_L Super_R"
+
+# --- SUPORTE AO MOUSE ---
+# Garante que Super + Clique mova janelas, liberando o Alt para o Micro/Terminal
+floating_modifier $mod
+tiling_drag modifier titlebar
+
+# --- FONTE ---
+font pango:JetBrainsMono Nerd Font 10
+
+# --- AUTOSTART ---
+exec --no-startup-id nm-applet
+exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
+# exec_always --no-startup-id picom --config ~/.config/picom/picom.conf
+exec_always --no-startup-id "killall -q picom; sleep 0.5; picom --config ~/.config/picom/picom.conf -b"
+# exec_always --no-startup-id bash ~/.config/polybar/launch.sh --hack
+exec_always --no-startup-id "killall greenclip; greenclip daemon"
+exec --no-startup-id dex --autostart --environment i3
+exec_always --no-startup-id feh --bg-fill /usr/share/wallpapers/KaliTiles/contents/images/kali-ascii.png
+# exec_always --no-startup-id systemctl enable nvidia-suspend.service nvidia-hibernate.service nvidia-resume.service
+exec_always xsetroot -cursor_name left_ptr
+exec --no-startup-id openrgb --profile "blue" --no-gui
+#exec_always --no-startup-id eww daemon && eww open bar
+exec_always --no-startup-id ~/.config/polybar/launch.sh
+
+# --- ESTÉTICA & GAPS (ATUALIZADO PARA BORDAS ELEGANTES) ---
+default_border pixel 2
+default_floating_border pixel 2
+gaps inner 1
+gaps outer 0
+smart_gaps off
+smart_borders on
+
+# --- CORES DO TEMA (CYBERPUNK/MINIMALISTA) ---
+# Classe                 Borda   Fundo   Texto   Indicador Split
+client.focused           #98C379 #98C379 #000000 #98C379   #98C379
+client.focused_inactive  #282C34 #282C34 #ABB2BF #282C34   #282C34
+client.unfocused         #282C34 #282C34 #ABB2BF #282C34   #282C34
+client.urgent            #E06C75 #E06C75 #FFFFFF #E06C75   #E06C75
+
+# --- ATALHOS DE APLICATIVOS ---
+bindsym $mod+t exec kitty
+bindsym $mod+q kill
+bindsym $mod+e exec dolphin
+bindsym $mod+a exec "rofi -modi drun,run -show drun -theme ~/.config/rofi/launchers/type-3/style-1.rasi"
+bindsym $mod+v exec --no-startup-id rofi -modi "clipboard:greenclip print" -show clipboard -run-command '{cmd}' -theme ~/.config/rofi/launchers/type-3/style-1.rasi
+
+# --- NAVEGAÇÃO ENTRE JANELAS ---
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# --- MOVIMENTAÇÃO DE JANELAS ---
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# --- LAYOUT CONTROL ---
+bindsym $mod+b split h
+bindsym $mod+Shift+v split v
+bindsym $mod+f fullscreen toggle
+bindsym $mod+Shift+space floating toggle
+
+# --- NAVEGAÇÃO DINÂMICA DE WORKSPACES ---
+bindsym Control+$mod+Right exec --no-startup-id i3-msg workspace number $(($(i3-msg -t get_workspaces | jq '.[] | select(.focused==true).num') + 1))
+bindsym Control+$mod+Left exec --no-startup-id i3-msg workspace number $(($(i3-msg -t get_workspaces | jq '.[] | select(.focused==true).num') - 1))
+
+# --- WORKSPACES FIXOS ---
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+10 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+10 move container to workspace number $ws10
+
+# --- MODO REDIMENSIONAR ---
+mode "resize" {
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# --- CONTROLE DO I3 ---
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+w floating toggle
+
+# --- CAPTURA DE TELA ---
+# Mapeado para Super + P como você usa nas suas macros do Keychron
+bindsym $mod+p exec flameshot gui
+bindsym Print exec flameshot gui
+
+# --- MULTIMÍDIA ---
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+bindsym Mod1+Shift+x exec notify-send "i3 recebeu o Alt"
+
+bindsym $mod+Shift+n exec redshift -O 3000
+bindsym $mod+Shift+m exec redshift -x
+
+exec --no-startup-id i3-msg workspace 2
+
+exec_always --no-startup-id autotiling
+gaps top 56
+exec_always --no-startup-id ~/.config/eww/launch-eww.sh

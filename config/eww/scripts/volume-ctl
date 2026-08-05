@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# =============================================================================
+# volume-ctl — Scroll handler for EWW volume widget
+# Usage: volume-ctl up|down
+# =============================================================================
+
+STEP=5
+
+case "$1" in
+  up)
+    pactl set-sink-volume @DEFAULT_SINK@ +${STEP}%
+    ;;
+  down)
+    pactl set-sink-volume @DEFAULT_SINK@ -${STEP}%
+    ;;
+esac

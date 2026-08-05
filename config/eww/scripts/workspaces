@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+get_workspaces() {
+  i3-msg -t get_workspaces 2>/dev/null | jq -c '[.[] | {num: .num, name: .name, focused: .focused, visible: .visible, urgent: .urgent}] | sort_by(.num)'
+}
+
+# Loop infinito — reconecta se i3 reiniciar
+while true; do
+  get_workspaces
+  i3-msg -t subscribe -m '["workspace","window"]' 2>/dev/null | while read -r _; do
+    get_workspaces
+  done
+  # Se chegou aqui, i3 reiniciou — espera e reconecta
+  sleep 1
+done
