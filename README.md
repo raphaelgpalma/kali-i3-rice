@@ -105,11 +105,28 @@ Depois de rodar os dois, faça logout e selecione a sessão **i3** na tela de
 login. Se o `optimize.sh` tiver reinstalado o driver NVIDIA, dê `sudo reboot`
 antes.
 
+## Tema GTK, ícones e cursor
+
+`install.sh` agora compila/instala automaticamente:
+
+- **Tema `kizus_phocus`** — fork ("kizu") de [janleigh/gtk3](https://github.com/janleigh/gtk3),
+  que por sua vez é baseado no tema [phocus](https://github.com/phocus/gtk).
+  Compilado com `npm install && npm run build` (usa `sass`) e instalado em
+  `~/.local/share/themes/kizus_phocus`.
+- **Ícones `zafiro-icon-theme`** — de [zayronxio/Zafiro-icons](https://github.com/zayronxio/Zafiro-icons),
+  variante `Dark` copiada e renomeada para `~/.local/share/icons/zafiro-icon-theme`
+  (pra bater com o nome usado em `config/gtk-3.0/settings.ini`).
+
+**Exceção: cursor "macOS Cursor Set"** não tem instalação automatizável — a
+página de origem, [gnome-look.org/p/1148748](https://www.gnome-look.org/p/1148748/)
+(rede Pling/KDE Store), não oferece link de download direto nem API estável
+(a antiga API OCS retorna `410 Gone`), só dá pra baixar clicando no site. O
+`install.sh` avisa isso na tela e você instala manualmente: baixe pelo link
+acima, extraia e copie a pasta para `~/.icons/`, conferindo se o nome bate
+com `macOS Cursor Set` (renomeie se vier diferente).
+
 ## O que NÃO está incluído (fora do escopo de "rice")
 
-- Tema GTK `kizus_phocus`, ícones `zafiro-icon-theme` e cursor `macOS Cursor
-  Set` — não são pacotes apt padrão do Kali nem têm fonte automatizável de
-  forma confiável; instale manualmente se quiser o visual 100% idêntico.
 - Aplicativos pesados (BloodHound, ferramentas de pentest, wordlists, etc.) —
   isso é ambiente de trabalho, não "rice" de desktop.
 - `~/.zsh_history`, `~/.bash_history`, credenciais, chaves — nada sensível é

@@ -17,7 +17,10 @@
 #   5. Instala o atuin (histórico de shell com busca fuzzy, usado no .zshrc)
 #   6. Instala oh-my-zsh + powerlevel10k + plugins de zsh
 #   7. Copia todas as configs (~/.config/*, dotfiles) e fontes Nerd Font
-#   8. Define zsh como shell padrão
+#   8. Compila/instala o tema GTK kizus_phocus e o icon theme zafiro-icon-theme
+#      (o cursor "macOS Cursor Set" não tem instalação automatizável — ver
+#      aviso impresso nesta etapa e o README)
+#   9. Define zsh como shell padrão
 #
 # Depois de rodar este script, rode também o optimize.sh (mesma pasta) para
 # aplicar os ajustes de sistema (boot, serviços, disco, driver de vídeo) que
@@ -49,7 +52,7 @@ if [[ $EUID -eq 0 ]]; then
   exit 1
 fi
 
-step "1/9 — Pacotes apt"
+step "1/10 — Pacotes apt"
 
 APT_PKGS=(
   # WM / X11 core
@@ -69,13 +72,15 @@ APT_PKGS=(
   fonts-jetbrains-mono
   # git/curl/build tooling
   git curl wget python3-pip pipx
+  # build deps do tema GTK kizus_phocus (compila com npm/sass)
+  nodejs npm
 )
 
 run "sudo apt update"
 run "sudo apt install -y ${APT_PKGS[*]}"
 info "Pacotes apt instalados"
 
-step "2/9 — Rust/Cargo (necessário para compilar o eww)"
+step "2/10 — Rust/Cargo (necessário para compilar o eww)"
 
 if ! command -v cargo &>/dev/null; then
   warn "Cargo não encontrado, instalando Rust via rustup..."
@@ -87,7 +92,7 @@ else
   info "Cargo já presente: $(cargo --version)"
 fi
 
-step "3/9 — Compilando e instalando o eww"
+step "3/10 — Compilando e instalando o eww"
 
 if command -v eww &>/dev/null; then
   info "eww já instalado ($(eww --version 2>/dev/null)), pulando build"
@@ -101,7 +106,7 @@ else
   info "eww compilado e instalado em /usr/local/bin/eww"
 fi
 
-step "4/9 — Instalando greenclip (gerenciador de clipboard)"
+step "4/10 — Instalando greenclip (gerenciador de clipboard)"
 
 if command -v greenclip &>/dev/null; then
   info "greenclip já instalado, pulando"
@@ -112,12 +117,12 @@ else
   info "greenclip instalado em /usr/local/bin/greenclip"
 fi
 
-step "5/9 — Instalando autotiling"
+step "5/10 — Instalando autotiling"
 
 run "pip3 install --user --break-system-packages autotiling || pipx install autotiling"
 info "autotiling instalado em ~/.local/bin"
 
-step "6/9 — Atuin (histórico de shell com busca fuzzy)"
+step "6/10 — Atuin (histórico de shell com busca fuzzy)"
 
 if command -v atuin &>/dev/null || [[ -x "$HOME/.atuin/bin/atuin" ]]; then
   info "atuin já instalado, pulando"
@@ -126,7 +131,7 @@ else
   info "atuin instalado em ~/.atuin/bin"
 fi
 
-step "7/9 — oh-my-zsh + powerlevel10k + plugins"
+step "7/10 — oh-my-zsh + powerlevel10k + plugins"
 
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   run "RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
@@ -148,7 +153,7 @@ if [[ ! -d "$HOME/.zsh/plugins/zsh-syntax-highlighting" ]]; then
 fi
 info "Plugins de zsh instalados"
 
-step "8/9 — Copiando configs, dotfiles e fontes"
+step "8/10 — Copiando configs, dotfiles e fontes"
 
 backup_and_copy() {
   local src="$1" dst="$2"
@@ -189,7 +194,53 @@ run "sudo mkdir -p /usr/share/wallpapers/KaliTiles/contents/images"
 run "sudo cp -a '$SCRIPT_DIR'/wallpapers/*.png /usr/share/wallpapers/KaliTiles/contents/images/ 2>/dev/null || true"
 info "Wallpaper copiado"
 
-step "9/9 — Shell padrão"
+step "9/10 — Tema GTK, ícones e cursor"
+
+# kizus_phocus (fork "kizu" de janleigh/gtk3, do tema phocus)
+# Fonte: https://github.com/janleigh/gtk3
+if [[ -d "$HOME/.local/share/themes/kizus_phocus" ]]; then
+  info "Tema kizus_phocus já instalado, pulando"
+else
+  TMPDIR_THEME=$(mktemp -d)
+  run "git clone --depth 1 https://github.com/janleigh/gtk3.git '$TMPDIR_THEME/gtk3'"
+  run "(cd '$TMPDIR_THEME/gtk3' && npm install && npm run build)"
+  run "mkdir -p '$HOME/.local/share/themes/kizus_phocus'"
+  run "cp -a '$TMPDIR_THEME/gtk3/index.theme' '$TMPDIR_THEME/gtk3/assets' '$TMPDIR_THEME/gtk3/dist/gtk-3.0' '$HOME/.local/share/themes/kizus_phocus/'"
+  run "rm -rf '$TMPDIR_THEME'"
+  info "Tema kizus_phocus instalado em ~/.local/share/themes/kizus_phocus"
+fi
+
+# zafiro-icon-theme (zayronxio/Zafiro-icons, variante Dark renomeada pra
+# bater com o nome usado em config/gtk-3.0/settings.ini)
+# Fonte: https://github.com/zayronxio/Zafiro-icons
+if [[ -d "$HOME/.local/share/icons/zafiro-icon-theme" ]]; then
+  info "Icon theme zafiro-icon-theme já instalado, pulando"
+else
+  TMPDIR_ICONS=$(mktemp -d)
+  run "git clone --depth 1 https://github.com/zayronxio/Zafiro-icons.git '$TMPDIR_ICONS/zafiro'"
+  run "mkdir -p '$HOME/.local/share/icons'"
+  run "cp -a '$TMPDIR_ICONS/zafiro/Dark' '$HOME/.local/share/icons/zafiro-icon-theme'"
+  run "rm -rf '$TMPDIR_ICONS'"
+  run "gtk-update-icon-cache -f -t '$HOME/.local/share/icons/zafiro-icon-theme' 2>/dev/null || true"
+  info "Icon theme zafiro-icon-theme instalado em ~/.local/share/icons/zafiro-icon-theme"
+fi
+
+# "macOS Cursor Set" (gnome-look.org) NÃO tem instalação automatizável: o
+# site (pling/gnome-look) não oferece link de download direto nem API
+# estável (a antiga API OCS retorna 410 Gone) — só dá pra baixar clicando
+# na página. Instale manualmente:
+if [[ -d "$HOME/.icons/macOS Cursor Set" || -d "$HOME/.local/share/icons/macOS Cursor Set" ]]; then
+  info "Cursor 'macOS Cursor Set' já presente, pulando"
+else
+  warn "Cursor 'macOS Cursor Set' precisa ser instalado manualmente:"
+  warn "  1. Baixe em https://www.gnome-look.org/p/1148748/ (botão de download da página)"
+  warn "  2. Extraia o .tar.gz/.zip"
+  warn "  3. Copie a pasta extraída para ~/.icons/ (crie se não existir)"
+  warn "  4. Confira se o nome da pasta bate com 'macOS Cursor Set' em"
+  warn "     config/gtk-3.0/settings.ini — renomeie a pasta se for diferente"
+fi
+
+step "10/10 — Shell padrão"
 
 if [[ "$SHELL" != *zsh ]]; then
   run "sudo chsh -s \"\$(command -v zsh)\" \"\$USER\""
