@@ -136,7 +136,6 @@ export PATH="$HOME/go/bin:$PATH"
 . "$HOME/.atuin/bin/env"
 
 eval "$(atuin init zsh)"
-eval "$(atuin init zsh)"
 
 # NemoClaw PATH setup
 export PATH="/home/kali/.local/bin:$PATH"

@@ -1,18 +1,27 @@
 #!/usr/bin/env bash
 # =============================================================================
-# install.sh — Reproduz o ambiente desktop (i3 + eww + kitty + zsh) deste
+# install.sh — Reproduz o ambiente desktop (i3 + polybar + kitty + zsh) deste
 # Kali Linux em qualquer Kali Linux "pelado" (limpo).
 #
+# Barra ativa: polybar, tema "Kali Dragon" (config/polybar/kali). O eww
+# (barra original) também é instalado/compilado e fica disponível como
+# fallback — ver README.md.
+#
 # O que este script faz:
-#   1. Instala pacotes apt necessários (i3, eww deps, picom, dunst, rofi,
-#      kitty, zsh, ferramentas de tema, etc.)
-#   2. Compila e instala o eww (bar) a partir do código-fonte (não está nos
-#      repositórios do Kali)
+#   1. Instala pacotes apt necessários (i3, polybar, eww deps, picom, dunst,
+#      rofi, kitty, zsh, ferramentas de tema, etc.)
+#   2. Compila e instala o eww (bar de fallback) a partir do código-fonte
+#      (não está nos repositórios do Kali)
 #   3. Baixa o binário do greenclip (gerenciador de clipboard)
 #   4. Instala o autotiling via pip
-#   5. Instala oh-my-zsh + powerlevel10k + plugins de zsh
-#   6. Copia todas as configs (~/.config/*, dotfiles) e fontes Nerd Font
-#   7. Define zsh como shell padrão
+#   5. Instala o atuin (histórico de shell com busca fuzzy, usado no .zshrc)
+#   6. Instala oh-my-zsh + powerlevel10k + plugins de zsh
+#   7. Copia todas as configs (~/.config/*, dotfiles) e fontes Nerd Font
+#   8. Define zsh como shell padrão
+#
+# Depois de rodar este script, rode também o optimize.sh (mesma pasta) para
+# aplicar os ajustes de sistema (boot, serviços, disco, driver de vídeo) que
+# fazem este Kali rodar do jeito que roda — ver README.md.
 #
 # Uso:
 #   ./install.sh            # instala tudo
@@ -40,7 +49,7 @@ if [[ $EUID -eq 0 ]]; then
   exit 1
 fi
 
-step "1/8 — Pacotes apt"
+step "1/9 — Pacotes apt"
 
 APT_PKGS=(
   # WM / X11 core
@@ -66,7 +75,7 @@ run "sudo apt update"
 run "sudo apt install -y ${APT_PKGS[*]}"
 info "Pacotes apt instalados"
 
-step "2/8 — Rust/Cargo (necessário para compilar o eww)"
+step "2/9 — Rust/Cargo (necessário para compilar o eww)"
 
 if ! command -v cargo &>/dev/null; then
   warn "Cargo não encontrado, instalando Rust via rustup..."
@@ -78,7 +87,7 @@ else
   info "Cargo já presente: $(cargo --version)"
 fi
 
-step "3/8 — Compilando e instalando o eww"
+step "3/9 — Compilando e instalando o eww"
 
 if command -v eww &>/dev/null; then
   info "eww já instalado ($(eww --version 2>/dev/null)), pulando build"
@@ -92,7 +101,7 @@ else
   info "eww compilado e instalado em /usr/local/bin/eww"
 fi
 
-step "4/8 — Instalando greenclip (gerenciador de clipboard)"
+step "4/9 — Instalando greenclip (gerenciador de clipboard)"
 
 if command -v greenclip &>/dev/null; then
   info "greenclip já instalado, pulando"
@@ -103,12 +112,21 @@ else
   info "greenclip instalado em /usr/local/bin/greenclip"
 fi
 
-step "5/8 — Instalando autotiling"
+step "5/9 — Instalando autotiling"
 
 run "pip3 install --user --break-system-packages autotiling || pipx install autotiling"
 info "autotiling instalado em ~/.local/bin"
 
-step "6/8 — oh-my-zsh + powerlevel10k + plugins"
+step "6/9 — Atuin (histórico de shell com busca fuzzy)"
+
+if command -v atuin &>/dev/null || [[ -x "$HOME/.atuin/bin/atuin" ]]; then
+  info "atuin já instalado, pulando"
+else
+  run "curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh | bash"
+  info "atuin instalado em ~/.atuin/bin"
+fi
+
+step "7/9 — oh-my-zsh + powerlevel10k + plugins"
 
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
   run "RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \"\$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)\""
@@ -130,7 +148,7 @@ if [[ ! -d "$HOME/.zsh/plugins/zsh-syntax-highlighting" ]]; then
 fi
 info "Plugins de zsh instalados"
 
-step "7/8 — Copiando configs, dotfiles e fontes"
+step "8/9 — Copiando configs, dotfiles e fontes"
 
 backup_and_copy() {
   local src="$1" dst="$2"
@@ -171,7 +189,7 @@ run "sudo mkdir -p /usr/share/wallpapers/KaliTiles/contents/images"
 run "sudo cp -a '$SCRIPT_DIR'/wallpapers/*.png /usr/share/wallpapers/KaliTiles/contents/images/ 2>/dev/null || true"
 info "Wallpaper copiado"
 
-step "8/8 — Shell padrão"
+step "9/9 — Shell padrão"
 
 if [[ "$SHELL" != *zsh ]]; then
   run "sudo chsh -s \"\$(command -v zsh)\" \"\$USER\""
