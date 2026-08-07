@@ -47,7 +47,7 @@ smart_borders on
 
 # --- CORES DO TEMA (CYBERPUNK/MINIMALISTA) ---
 # Classe                 Borda   Fundo   Texto   Indicador Split
-client.focused           #98C379 #98C379 #000000 #98C379   #98C379
+client.focused           #1B3A6B #1B3A6B #FFFFFF #1B3A6B   #1B3A6B
 client.focused_inactive  #282C34 #282C34 #ABB2BF #282C34   #282C34
 client.unfocused         #282C34 #282C34 #ABB2BF #282C34   #282C34
 client.urgent            #E06C75 #E06C75 #FFFFFF #E06C75   #E06C75
